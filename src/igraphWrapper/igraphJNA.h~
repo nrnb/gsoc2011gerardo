@@ -1,0 +1,83 @@
+//Author Gang Su.
+//sugang@umich.edu
+
+#ifdef __linux__
+#define _declspec(x)
+#endif /* linux */
+
+//#ifdef macintosh
+#define _declspec(x)
+//#endif /* macintosh */
+
+extern "C"
+{
+	//test functions
+	_declspec(dllexport) int nativeAdd( int a, int b );
+	_declspec(dllexport) void nativeIncrement(int* iptr);
+	_declspec(dllexport) int nativeArrayReset(int data[], int length);
+	_declspec(dllexport) int nativeCountAdd(int value);
+	_declspec(dllexport) void nativeArrayTest(int data[]);
+	_declspec(dllexport) void nativeMemoryAllocate(int **data, int *length); //pointer to pointer reference
+	_declspec(dllexport) void nativePointerMemoryAllocate(int *data, int *length); //single pointer reference
+	_declspec(dllexport) void nativeListAllocate(int*** data, int** list_lengths, int* data_length); //Return a zig-zag type
+	_declspec(dllexport) void nativeMatrixAllocate(int** data, int* nrow, int* ncol);
+
+	//igraph functions
+	_declspec(dllexport) void createGraph(int edgeArray[], int length);
+	_declspec(dllexport) bool isSimple();
+	_declspec(dllexport) bool isConnected();
+	_declspec(dllexport) void simplify();
+	_declspec(dllexport) void clusters(int membership[], int csize[], int* numCluster);
+	_declspec(dllexport) int nodeCount();
+	_declspec(dllexport) int edgeCount();
+
+	_declspec(dllexport) void fastGreedy(int membership[], double* modularity, int csize[], int * numCluster);
+	_declspec(dllexport) void labelPropagation(int membership[], double* modularity);
+	_declspec(dllexport) void walkTrap(int membership[], double*modularity, int csize[], int * numCluster);
+	_declspec(dllexport) void edgeBetweenness(int membership[], double*modularity, int csize[], int * numCluster);
+	_declspec(dllexport) void spinGlass(int membership[], double* modularity, int csize[], int* numCluster);
+	_declspec(dllexport) void spinGlassSingle(int target, int community[], int* community_size); //only compute community close to the target id
+	//Can also make a function to compute an array of ids, if possible in later versions.
+
+	_declspec(dllexport) void leadingEigenvector(int membership[], double* modularity);
+
+	//Layout functions
+	_declspec(dllexport) void layoutRandom(double x[], double y[]);
+	_declspec(dllexport) void layoutCircle(double x[], double y[]); //node size is easily got from igraph
+
+	//This is a complex one
+	_declspec(dllexport) void layoutGraphOpt(double x[], double y[], int iter, double nodeCharge, double nodeMass, int SpringLength, double SpringConstant, double maxSaMovement, bool useSeed);
+
+	//drl, currently not working
+	_declspec(dllexport) void layoutDRL(double x[], double y[], bool useSeed, int mode);
+
+	//fruchterman reingold
+	_declspec(dllexport) void layoutFruchterman(double x[], double y[], int iter, double maxDelta, double area, double coolExp, double repulserad, bool useSeed);
+
+	//kamada, kawai
+	_declspec(dllexport) void layoutKamadaKawai(double x[], double y[], int iter, double sigma, double initTemp, double coolExp, double kkConsts, bool useSeed);
+
+
+	//These two will allow the user to choose a root
+	//reingold_tilford
+	_declspec(dllexport) void layoutReingoldTilford(double x[], double y[], int root);
+
+	//reingold_circular
+	_declspec(dllexport) void layoutReingoldTilfordCircular(double x[], double y[], int root);
+
+	//for large graphs
+	_declspec(dllexport) void layoutGridFruchtermanReingold(double x[], double y[], int iter, double maxDelta, double area, double coolExp, double repulserad, double cellSize, bool useSeed);
+
+	//for lgl, this also allow u to pick a root
+	_declspec(dllexport) void layoutLGL(double x[], double y[], int maxIt, double maxDelta, double area, double coolExp, double repulserad, double cellSize, int root);
+
+	
+	//shortest paths
+	_declspec(dllexport) void distMatrix(double dist1d[]);
+
+
+	
+	//Multi dimensional array at least one dimension should be known.
+	//_declspec(dllexport) int nativeMatrixReset(int data[][], int nrow, int ncol);
+
+}

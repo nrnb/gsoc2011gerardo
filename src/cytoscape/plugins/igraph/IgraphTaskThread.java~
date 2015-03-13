@@ -1,0 +1,65 @@
+//This is specifically for performing the thread
+public class GLayALGTaskThread extends Thread{
+    private int algorithmID = -1;
+    private GLayResultObject result = null;
+
+        public void setAlgorithm(int id){
+            this.algorithmID = id;
+        }
+
+        public GLayResultObject getResult(){
+            return this.result;
+        }
+        @Override
+        public void run(){
+            //GLayEngine gle = new GLayEngine();
+            this.result = null;
+            switch(this.algorithmID){
+                case GLayConstants.ALG_FAST_GREEDY_G:
+                result = GLayEngine.fastgreedy_g();
+                break;
+            case GLayConstants.ALG_FAST_GREEDY_HE_G:
+                result = GLayEngine.fastgreedy_g_he();
+                break;
+            case GLayConstants.ALG_FAST_GREEDY_HN_G:
+                result = GLayEngine.fastgreedy_g_hn();
+                break;
+            case GLayConstants.ALG_FAST_GREEDY_HEN_G:
+                result = GLayEngine.fastgreedy_g_hen();
+                break;
+            case GLayConstants.ALG_CLUSTER:
+                result = GLayEngine.cluster();
+                break;
+            case GLayConstants.ALG_FAST_GREEDY:
+                result = GLayEngine.fastGreedy();
+                break;
+            case GLayConstants.ALG_WALK_TRAP:
+                result = GLayEngine.walkTrap();
+                break;
+            case GLayConstants.ALG_LABEL_PROPAGATION:
+                result = GLayEngine.labelPropagation();
+                break;
+            case GLayConstants.ALG_EDGE_BETWEENNESS:
+                result = GLayEngine.edgeBetweenness();
+                break;
+            case GLayConstants.ALG_SPIN_GLASS:
+                result = GLayEngine.spinGlass();
+                break;
+            case GLayConstants.ALG_LEADING_EIGENVECTOR:
+                result = GLayEngine.leadingEigenvector();
+                break;
+
+            case GLayConstants.ALG_SPIN_GLASS_SINGLE:
+                //require at least 1 node to be selected
+                result = GLayEngine.spinGlassSingle();
+                break;
+                
+            case -1:
+
+                //System.out.println("No algorithm was assigned. Do nothing.");
+
+
+
+            }
+        }
+}

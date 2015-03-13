@@ -1,0 +1,167 @@
+<!-- =================================================================== -->
+<!-- Plugin build file     -->
+<!-- =================================================================== -->
+
+<project name="Igraph Plugin" default="all" basedir=".">
+
+  <!-- =================================================================== -->
+  <!-- Initialization target                                               -->
+  <!-- =================================================================== -->
+  <target name="init">
+    <property name="plugin_name" value="IgraphPlugin"/>
+    <property name="plugin_class" value="cytoscape.plugins.igraph.IgraphPlugin"/>
+    <property name="package_path" value="cytoscape/plugins/igraph"/> 
+    <property name="project.jar" value="${plugin_name}.jar"/> 
+    <property name="version" value="0.01"/>
+    <property name="year" value="2011"/>
+
+    <echo message="Building plugin ${plugin_name} version ${version}..."/>
+
+    <!-- Define the plugin directories -->
+    <property name="root.dir" value="."/>
+    <property name="src.dir" value="${root.dir}/src"/>
+    <property name="build.dir" value="${root.dir}/build"/>
+    <property name="manifest.dir" value="${root.dir}/manifest"/>
+    <property name="resources.dir" value="${root.dir}/resources"/>
+
+    <!-- Define the Cytoscape directories -->
+    <property name="cytoscape.dir" value="/Applications/Cytoscape_v2.8.1"/>
+    <property name="cytoscape.plugin.dir" value="${cytoscape.dir}/plugins"/>
+
+    <!-- Define igraph directory -->
+    <property name="igraph.dir" value="/Users/gerardohuck/igraph"/>
+    <property name="igraphWrapper_src.dir" value="${src.dir}/igraphWrapper"/>
+
+    <!-- Inheritable properties -->
+    <property name="debug" value="on"/>
+    <property name="optimize" value="off"/>
+    <property name="deprecation" value="on"/>
+    <property name="nowarn" value="true"/>
+    <property name="fork" value="false"/>
+
+    <!-- Check the availability of some files -->  
+    <available file="${cytoscape.dir}/cytoscape.jar" property="cytoscape.present"/> 
+    <available file="${root.dir}/plugin.props" property="plugin.prop.present"/>
+    <available file="${root.dir}/License.txt" property="license.present"/>
+    <available file="${root.dir}/libigraphWrapper.dylib" property="igraphWrapper.lib.present"/>
+    <available file="${resources.dir}/jna.jar" property="jna.jar.present"/>
+
+    <!-- Define the java class path -->
+    <path id="project.class.path">
+      <pathelement location="${cytoscape.dir}/cytoscape.jar"/>
+      <pathelement path="${java.class.path}/"/>
+      <pathelement location="${resources.dir}/jna.jar"/>
+      <fileset dir="${cytoscape.plugin.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Compiles the project                                           -->
+  <!-- =================================================================== -->
+  <target name="compile" depends="init"  >
+
+   <echo message="COMPILE ${plugin_name} ..."/>
+    
+    <mkdir dir="${build.dir}"/>
+
+    <javac srcdir="${src.dir}"
+           excludes="${excludes}"
+           classpathref="project.class.path"
+           destdir="${build.dir}"
+           debug="${debug}"
+           nowarn="${nowarn}"
+           deprecation="${deprecation}" 
+           optimize="${optimize}"
+           fork="${fork}"
+	   includeantruntime="false"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Executes "make" in igraphWrapper, buiding static library            -->
+  <!-- =================================================================== -->
+  <target name="igraphWrapper_compile" depends="init"  >
+    <echo message="Compiling igraph wrapper library..."/>
+    <exec executable="make" dir="${igraphWrapper_src.dir}"/>
+  </target>
+
+
+  <!-- =================================================================== -->
+  <!-- Creates the plugin jar file                                           -->
+  <!-- =================================================================== -->
+  <target name="jar" depends="compile, copy_plugin_prop, copy_license,
+			      copy_igraphWrapper_lib, copy_jna_jar">  
+    <jar destfile="${project.jar}">
+      <manifest> <attribute name="Cytoscape-Plugin" value="${plugin_class}"/> </manifest>
+      <fileset dir="${build.dir}" includes="**"/>
+    </jar>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- If plugin.prop exist, copy it to build directory  -->
+  <!-- =================================================================== -->
+  <target name="copy_plugin_prop" if="plugin.prop.present">
+    <copy todir="${build.dir}/${package_path}" file="${root.dir}/plugin.props"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- If License.txt exist, copy it to build directory  -->
+  <!-- =================================================================== -->
+  <target name="copy_license" if="license.present">
+    <copy todir="${build.dir}/" file="${root.dir}/License.txt"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- If igraphWrapper.lib exist, copy it to build directory  -->	
+  <!-- =================================================================== -->
+  <target name="copy_igraphWrapper_lib" depends="igraphWrapper_compile">
+    <echo message="copying igraphWrapper lib to build dir"/>
+    <copy todir="${build.dir}/" file="${igraphWrapper_src.dir}/libigraphWrapper.dylib"/>	
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- If jna.jar exists, copy it to build directory  -->	
+  <!-- =================================================================== -->
+  <target name="copy_jna_jar" if="jna.jar.present">
+    <echo message="copying jna.jar to build dir"/>
+    <copy todir="${build.dir}/" file="${resources.dir}/jna.jar"/>	
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Copy jar file to Cytoscape plugin folder                            -->
+  <!-- =================================================================== -->
+  <target name="copy_jar" depends="jar">
+    <copy todir="${cytoscape.plugin.dir}/" file="${root.dir}/${project.jar}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- An alias target for compiling everything and running all tests.     -->
+  <!-- =================================================================== -->
+  <target name="all" depends="copy_jar">
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Clean up, get back to original state                                -->
+  <!-- =================================================================== -->
+  <target name="clean" depends="init">
+    <delete dir="${build.dir}"/>
+    <delete file="${root.dir}/${project.jar}"/>
+    <exec executable="make" dir="${igraphWrapper_src.dir}">
+      <arg line="clean"/>
+    </exec>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Clean up libraries extracted in plugins folder                      -->
+  <!-- =================================================================== -->
+  <target name="clean-libs" depends="init, clean">
+    <delete file="${cytoscape.plugin.dir}/libigraphWrapper.dylib"/>
+    <delete file="${cytoscape.plugin.dir}/jna.jar"/>
+  </target>
+
+
+</project>
+
+<!-- End of file -->
